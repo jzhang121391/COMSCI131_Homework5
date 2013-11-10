@@ -1,0 +1,21 @@
+Upon first starting the project, my initial instincts were to write the matcher
+from scratch without using an acceptor. However, after I examined the hint
+code, I realized that much, if not all, of the functionality required was
+already present. The only missing component was a definition for "accept".
+
+Knowing this, I set off to define "accept" but using Scheme's continuation.
+My created "accept" takes in "frag" as an argument and following
+specifications, it outputs a pair of "frag" and a continuation. But prior to
+that, the position in the "accept" procedure is marked. Consequently, when the
+main "make-matcher" function calls it again, it will return to line marked by
+"call/cc" and proceed from there, only to purposely return false. By returning
+false, the main function is permitted to analyze the next part of the segment
+(cdr frag).
+
+Once backtracking was implemented, I needed to ensure that the user could not
+interfere with my now defined acceptor (as was not the case before). To
+achieve this, I created a wrapper function "make-matcher" (the old 
+"make-matcher" now renamed to "make-matcher-old") that accepts a pattern first
+and then a "frag". Once received, it passes in both arguments plus "accept"
+into "make-matcher-old", ensuring that the redefined acceptor will always be
+the one being passed in while leaving "pat" and "frag" for user input.
